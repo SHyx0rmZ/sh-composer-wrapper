@@ -1,0 +1,27 @@
+#!/bin/sh
+
+php_composer() {
+  which composer || \
+  which composer.phar
+}
+
+php_extension_dir() {
+  php -i | \
+  grep '^extension_dir\b' | \
+  awk '{print $3}'
+}
+
+php_options() {
+  echo "--define extension=mysqlnd.so --define extension=pdo.so $(
+    find "$(php_extension_dir)" -maxdepth 1 -type f | \
+    xargs --max-args 1 basename | \
+    sort | \
+    grep --invert-match xdebug | \
+    grep --invert-match --extended-regexp 'mysqlnd|pdo\.so|wddx|pgsql|memcached' | \
+    sed --expression 's/\(.*\)/ --define extension=\1/' | \
+    sed --expression 's/extension=\(opcache\)/zend_extension=\1/' | \
+    tr --delete '\n'
+  )"
+}
+
+php --define memory_limit=-1 --no-php-ini $(php_options) $(php_composer) $*
