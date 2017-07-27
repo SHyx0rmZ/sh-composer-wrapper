@@ -24,4 +24,20 @@ php_options() {
   )"
 }
 
+wrapper_dir() {
+  realpath "${0}" | \
+  xargs dirname
+}
+
+wrapper_scripts() {
+  find "$(wrapper_dir)" -maxdepth 1 -type f -name '*.sh' | \
+  xargs echo ' '
+}
+
+for script in $(wrapper_scripts); do
+  if [ -x "${script}" ]; then
+    . "${script}"
+  fi
+done
+
 php --define memory_limit=-1 --no-php-ini $(php_options) $(php_composer) $*
