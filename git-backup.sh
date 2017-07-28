@@ -56,8 +56,8 @@ git_backup_target() {
     local PARENT=""
     local CHILD="$(basename "$2")"
   else
-    local PARENT="/$(echo "$1" | sed 's@/vendor/.*@@' | xargs basename)"
-    local CHILD="$(echo "$2")"
+    local PARENT="/$(echo "$1" | sed 's@/vendor/.*@@' | xargs basename)/$(dirname "$2" | xargs basename)"
+    local CHILD="$(basename "$2")"
   fi
 
   mkdir -p "$(git_backup_cache_dir)${PARENT}"
