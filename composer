@@ -1,7 +1,6 @@
 #!/bin/sh
 
 php_composer() {
-  which composer || \
   which composer.phar
 }
 
