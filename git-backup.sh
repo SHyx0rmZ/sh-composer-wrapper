@@ -20,6 +20,10 @@ git_backup() {
   fi
 }
 
+git_backup_cache_dir() {
+  echo "${HOME}/.cache/sh-composer-wrapper"
+}
+
 git_backup_repository() {
   cd "$1"
 
@@ -40,15 +44,25 @@ git_backup_repository() {
     return
   fi
 
-  local REPONAME="$(git rev-parse --show-toplevel | xargs basename)"
+  local REPONAME="$(echo "$(git rev-parse --show-toplevel | xargs dirname | xargs basename)/$(git rev-parse --show-toplevel | xargs basename)")"
 
-  echo "  - Backing up Git repository to \033[32m$(git_backup_target "${REPONAME}")\033[0m (\033[0;33m$(echo $1 | sed 's@.*/vendor/@@')\033[0m)"
+  echo "  - Backing up Git repository to \033[32m$(git_backup_target "${1}" "${REPONAME}")\033[0m (\033[0;33m$(echo "$1" | sed 's@.*/vendor/@@')\033[0m)"
 
-  git bundle create "$(git_backup_target "${REPONAME}")" --all 2> /dev/null
+  git bundle create "$(git_backup_target "${1}" "${REPONAME}")" --all 2> /dev/null
 }
 
 git_backup_target() {
-  echo "${HOME}/Desktop/${1}.git"
+  if [ "$1" = "." ]; then
+    local PARENT=""
+    local CHILD="$(basename "$2")"
+  else
+    local PARENT="/$(echo "$1" | sed 's@/vendor/.*@@' | xargs basename)"
+    local CHILD="$(echo "$2")"
+  fi
+
+  mkdir -p "$(git_backup_cache_dir)${PARENT}"
+
+  echo "$(git_backup_cache_dir)${PARENT}/${CHILD}.git"
 }
 
 case "$1" in
