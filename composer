@@ -33,7 +33,7 @@ wrapper_scripts() {
   xargs echo ' '
 }
 
-PWD="$(pwd)"
+WORKING_DIRECTORY="$(pwd)"
 
 for script in $(wrapper_scripts); do
   if [ -x "${script}" ]; then
@@ -41,6 +41,6 @@ for script in $(wrapper_scripts); do
   fi
 done
 
-cd "${PWD}"
+cd "${WORKING_DIRECTORY}"
 
 php --define memory_limit=-1 --no-php-ini $(php_options) $(php_composer) $*
