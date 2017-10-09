@@ -33,10 +33,14 @@ wrapper_scripts() {
   xargs echo ' '
 }
 
+PWD="$(pwd)"
+
 for script in $(wrapper_scripts); do
   if [ -x "${script}" ]; then
     . "${script}"
   fi
 done
+
+cd "${PWD}"
 
 php --define memory_limit=-1 --no-php-ini $(php_options) $(php_composer) $*
